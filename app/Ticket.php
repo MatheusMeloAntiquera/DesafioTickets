@@ -10,9 +10,32 @@ class Ticket extends Moloquent
     protected $connection = 'mongodb';
 
     protected $dates = ['DateCreate'];
+    
+    //Define quais colunas podem ser ordenadas
+    protected $colunasOrder = ['DateCreate','DateUpdate','Priority'];
 
     public function filtrar($filtro)
     {
+        //Determina o limite de registros por página
+        $limitePaginas = !empty($filtro->paginate) ? intval($filtro->paginate) : 3;
+
+
+        //Ordenação
+        //Define a ordenação default
+        $coluna = '_id';
+        $direcao = 'desc';
+
+        //Se teve o parametro "order_by", então verifica se a coluna informada pode ser ordenada
+        if ($filtro->has('order_by') && in_array($filtro->order_by, $this->colunasOrder)) {
+                $coluna = $filtro->order_by;     
+
+                //Define a direção: asc ou desc. Default: desc
+                if(isset($filtro->asc) && $filtro->asc == true){
+                    $direcao = 'asc';
+                }
+        }
+
+        //Define os "where"
         return $this->where(function ($query) use ($filtro) {
 
             // Necessário fazer a verificação dos campos,
@@ -26,10 +49,13 @@ class Ticket extends Moloquent
                 $query->where('DateCreate', '<=', $filtro->end_at);
             }
 
-            if ($filtro->has('priority')) {
-                $query->where('priority', $filtro->priority);
+            if ($filtro->has('Priority')) {
+                $query->where('Priority', $filtro->priority);
             }
 
-        })->get();
+        })->orderBy($coluna, $direcao)
+        ->paginate($limitePaginas);
+    
+
     }
 }
