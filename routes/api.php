@@ -20,3 +20,4 @@ use Illuminate\Http\Request;
 
 Route::get('/', 'TicketController@index');
 Route::get('/classificar', 'TicketController@classificarTickets');
+Route::post('/filtrar', 'TicketController@filtrar');
