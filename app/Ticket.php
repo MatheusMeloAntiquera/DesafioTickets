@@ -10,7 +10,9 @@ class Ticket extends Moloquent
     protected $connection = 'mongodb';
 
     protected $dates = ['DateCreate'];
-    
+
+    public $timestamps = false;
+
     //Define quais colunas podem ser ordenadas
     protected $colunasOrder = ['DateCreate','DateUpdate','Priority'];
 
@@ -27,7 +29,7 @@ class Ticket extends Moloquent
 
         //Se teve o parametro "order_by", então verifica se a coluna informada pode ser ordenada
         if ($filtro->has('order_by') && in_array($filtro->order_by, $this->colunasOrder)) {
-                $coluna = $filtro->order_by;     
+                $coluna = $filtro->order_by;
 
                 //Define a direção: asc ou desc. Default: desc
                 if(isset($filtro->asc) && $filtro->asc == true){
@@ -55,7 +57,7 @@ class Ticket extends Moloquent
 
         })->orderBy($coluna, $direcao)
         ->paginate($limitePaginas);
-    
+
 
     }
 }
