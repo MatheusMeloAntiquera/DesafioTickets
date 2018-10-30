@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Ticket;
 use Illuminate\Http\Request;
 use DateTime;
+use Validator;
+use Illuminate\Validation\Rule;
+
 
 
 class TicketController extends Controller
@@ -41,6 +44,26 @@ class TicketController extends Controller
 
     public function filtrar(Ticket $ticketModel, Request $request)
     {
+
+        //Simples validação dos campos da requisição
+       $validator = Validator::make($request->all(), [
+            'paginate' => 'numeric',
+            'start_at' => 'date|date_format:Y-m-d',
+            'end_at' => 'date|date_format:Y-m-d|after:start_at',
+            'order_by' => [
+                 Rule::in(['DateCreate','DateUpdate','Priority'])
+            ],
+            'asc' => 'boolean',
+            'priority' => [
+                 Rule::in(['alta','normal'])
+            ]
+        ]);
+
+        if ($validator->fails()) {
+
+            return response()->json($validator->errors(), 400, array(), JSON_PRETTY_PRINT);
+        }
+
         $tickets = $ticketModel->filtrar($request);
 
         return response()->json($tickets, 200, array(), JSON_PRETTY_PRINT);

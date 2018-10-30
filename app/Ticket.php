@@ -13,9 +13,6 @@ class Ticket extends Moloquent
 
     public $timestamps = false;
 
-    //Define quais colunas podem ser ordenadas
-    protected $colunasOrder = ['DateCreate','DateUpdate','Priority'];
-
     public function filtrar($filtro)
     {
         //Determina o limite de registros por página
@@ -27,8 +24,8 @@ class Ticket extends Moloquent
         $coluna = '_id';
         $direcao = 'desc';
 
-        //Se teve o parametro "order_by", então verifica se a coluna informada pode ser ordenada
-        if ($filtro->has('order_by') && in_array($filtro->order_by, $this->colunasOrder)) {
+        //Se teve o parametro "order_by"
+        if ($filtro->has('order_by')) {
                 $coluna = $filtro->order_by;
 
                 //Define a direção: asc ou desc. Default: desc
@@ -51,7 +48,7 @@ class Ticket extends Moloquent
                 $query->where('DateCreate', '<=', $filtro->end_at);
             }
 
-            if ($filtro->has('Priority')) {
+            if ($filtro->has('priority')) {
                 $query->where('Priority', $filtro->priority);
             }
 
