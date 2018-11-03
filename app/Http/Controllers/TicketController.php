@@ -3,22 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Ticket;
+use App\Palavras;
 use Illuminate\Http\Request;
 use DateTime;
 use Validator;
 use Illuminate\Validation\Rule;
 
 
-
 class TicketController extends Controller
 {
-
-    private $palavrasInsatisfacao = [
-        'reclamação', 'troco', 'trocar',
-        'cancelamento', 'cancelar', 'cancelo',
-        'defeito','procon','reclameaqui',
-    ];
-
     //Peso por dia de atraso. Exemplo: 2 dias de atraso = 1 ponto
     private $pesoPorAtraso = 0.5;
 
@@ -104,8 +97,6 @@ class TicketController extends Controller
             return response()->json($retorno , 500, array(), JSON_PRETTY_PRINT);
         }
 
-
-
     }
     /**
      * Calcula a pontuação de cada Ticket
@@ -135,13 +126,14 @@ class TicketController extends Controller
     {
         $mensagens = $ticket->Interactions;
         $pontuacao = 0;
+        $palavrasInsatisfacao = Palavras::all();
 
         foreach ($mensagens as $msg) {
 
             //Apenas verifica as mensagens do cliente
             if ($msg['Sender'] == 'Customer') {
 
-                foreach ($this->palavrasInsatisfacao as $p) {
+                foreach ($palavrasInsatisfacao->all() as $p) {
 
                     $assunto = mb_strtolower($msg['Subject'],'UTF-8');
                     $mensagem = mb_strtolower($msg['Message'],'UTF-8');
@@ -150,14 +142,12 @@ class TicketController extends Controller
 
                     //Busca no assunto se contem as palavras de insatisfação e também elimina as resposta, ou seja,
                     // assuntos quem tem a palavra "RE:"
-                    if (strpos($assunto, $p) !== false && strpos($assunto, 're:') === false) {
+                    if (strpos($assunto, $p['desc']) !== false && strpos($assunto, 're:') === false) {
                         $pontuacao += 5;
-                        echo $assunto . "<br>";
                     }
 
                     /* ########## VERIFICAÇÃO DA MENSAGEM ########### */
-                    if (strpos($mensagem, $p) !== false) {
-                        echo $mensagem . "<br>";
+                    if (strpos($mensagem, $p['desc']) !== false) {
                         $pontuacao += 5;
                     }
 

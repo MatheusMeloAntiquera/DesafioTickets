@@ -16,8 +16,7 @@ class Ticket extends Moloquent
     public function filtrar($filtro)
     {
         //Determina o limite de registros por página
-        $limitePaginas = !empty($filtro->paginate) ? intval($filtro->paginate) : 3;
-
+        $limitePaginas = !empty($filtro->paginate) ? intval($filtro->paginate) : 1000;
 
         //Ordenação
         //Define a ordenação default
